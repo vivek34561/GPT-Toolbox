@@ -1,0 +1,40 @@
+name: Deploy to HF Spaces
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          lfs: true
+      
+      - name: Remove binary files before push
+        run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+          
+          # Remove any binary files
+          find . -name "*.gif" -type f -delete
+          find . -name "*.png" -type f -delete
+          find . -name "*.jpg" -type f -delete
+          
+          git add -A
+          git commit -m "Remove binary files for HF" || true
+      
+      - name: Push to Hugging Face
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          HF_TOKEN_CLEAN=$(echo $HF_TOKEN | tr -d '\n\r ')
+          
+          git remote add space "https://vivek231:${HF_TOKEN_CLEAN}@huggingface.co/spaces/vivek231/Smart_Chatbot_with_websearch" 2>/dev/null || \
+          git remote set-url space "https://vivek231:${HF_TOKEN_CLEAN}@huggingface.co/spaces/vivek231/Smart_Chatbot_with_websearch"
+          
+          git push space main --force

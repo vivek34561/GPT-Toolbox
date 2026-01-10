@@ -1,0 +1,14 @@
+langgraph
+langchain
+langchain-openai
+dotenv
+streamlit
+fastapi
+uvicorn
+langchain-groq
+duckduckgo-search
+langchain-community
+ddgs
+langchain-tavily
+mcp[cli]
+# 
